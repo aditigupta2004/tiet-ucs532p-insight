@@ -1,6 +1,6 @@
-# Video Preprocessing Demo
+# STEP 1: VIDEO PREPROCESSING 
 
-This project demonstrates basic video frame preprocessing with OpenCV. It reads a video file, converts frames to grayscale, optionally applies CLAHE for contrast enhancement, and then applies Gaussian blur. The original and processed frames are displayed side by side.
+Demonstrates basic video frame preprocessing with OpenCV. It reads a video file, converts frames to grayscale, optionally applies CLAHE for contrast enhancement, and then applies Gaussian blur. The original and processed frames are displayed side by side.
 
 ## Files
 
