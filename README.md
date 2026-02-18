@@ -1,4 +1,9 @@
-# Smart Parking Detection using Classical Computer Vision
+# 🚗 Vehicle Detection System using Computer Vision
+
+![Python](https://img.shields.io/badge/Python-3.x-blue.svg)
+![OpenCV](https://img.shields.io/badge/OpenCV-4.x-green.svg)
+![Status](https://img.shields.io/badge/Status-Active-success.svg)
+![Made With](https://img.shields.io/badge/Made%20With-Computer%20Vision-orange.svg)
 
 This project aims to detect empty and occupied parking spaces using CCTV video feeds using classical computer vision techniques (no deep learning).
 
@@ -20,6 +25,7 @@ This step performs basic preprocessing on video frames.
 
 - Original video frames
 - Processed frames (grayscale + contrast enhanced + blurred)
+![Step 1 Output](screenshots/Step1.png)
 
 ### Files
 
@@ -44,6 +50,7 @@ This step detects moving objects (vehicles) using classical computer vision.
 - Foreground mask:
   - White pixels represent moving objects (vehicles)
   - Black pixels represent background
+![Step 2 Output](screenshots/Step2.png)
 
 ### Files
 
