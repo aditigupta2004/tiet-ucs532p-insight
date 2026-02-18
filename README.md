@@ -69,7 +69,9 @@ Occupancy Classification
 
 Install dependencies:
 
+```bash
 pip install opencv-python
+```
 
 ---
 
@@ -77,11 +79,15 @@ pip install opencv-python
 
 1. Place your video file in:
 
+```
 videos/video1.mp4
+```
 
 2. Run the program:
 
+```bash
 python main.py
+```
 
 3. Controls:
 
