@@ -59,13 +59,35 @@ This step detects moving objects (vehicles) using classical computer vision.
 
 ---
 
-## PROJECT PIPELINE
+## STEP 3: PARKING SLOT DETECTION
 
-Video Input  
-Preprocessing  
-Background Subtraction  
-Parking Slot Detection (next step)  
-Occupancy Classification  
+This step detects parking slot occupancy using Region of Interest (ROI) based analysis.
+
+### Approach
+
+- Parking slots are manually defined using a click-based annotation tool
+- Each slot is represented as a polygon (4 points)
+- A mask is created for each slot region
+- Foreground pixels inside each slot are analyzed
+- If pixel density exceeds a threshold, the slot is marked as occupied
+
+### Output
+
+- Parking slots are drawn on the frame:
+  - Green: Empty
+  - Red: Occupied
+![Step 3 Output](screenshots/Step3_a.png)
+![Step 3 Output](screenshots/Step3_b.png)
+
+- ⚠️Current issue to be fixed:
+  - Shows green if a car already present
+  - Turns red only when a car is moving into the spot and turns green again when the car stops 
+
+### Files
+
+- `slot_annotation.py`: Tool to annotate parking slots
+- `slots.json`: Stores slot coordinates
+- Updated `main.py`: Performs occupancy detection
 
 ---
 
@@ -89,30 +111,21 @@ pip install opencv-python
 ```
 videos/video1.mp4
 ```
+2. Run the slot annotation tool
 
-2. Run the program:
+```bash
+python slot_annotation.py
+```
+
+3. Run the program:
 
 ```bash
 python main.py
 ```
 
-3. Controls:
-
+4. Controls:
+- Press `s` to save the slots
+- Press `r` to reset the slots
 - Press `q` to quit
 
 ---
-
-## FUTURE WORK
-
-- Parking slot detection using ROI (Region of Interest)
-- Slot-wise occupancy classification
-- Nearest parking slot recommendation
-- Multi-camera support
-
----
-
-## NOTES
-
-- Ensure correct video path in `main.py`
-- Works best with static CCTV cameras
-- Uses only classical computer vision techniques
