@@ -1,4 +1,4 @@
-# 🚗 Vehicle Detection System using Computer Vision
+# 🚗 Parking spot Detection System using Computer Vision
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue.svg)
 ![OpenCV](https://img.shields.io/badge/OpenCV-4.x-green.svg)
