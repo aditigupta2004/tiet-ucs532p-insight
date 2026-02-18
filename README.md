@@ -1,51 +1,105 @@
-# STEP 1: VIDEO PREPROCESSING 
+# Smart Parking Detection using Classical Computer Vision
 
-Demonstrates basic video frame preprocessing with OpenCV. It reads a video file, converts frames to grayscale, optionally applies CLAHE for contrast enhancement, and then applies Gaussian blur. The original and processed frames are displayed side by side.
+This project aims to detect empty and occupied parking spaces using CCTV video feeds using classical computer vision techniques (no deep learning).
 
-## Files
+The system processes video frames, detects foreground objects (vehicles), and will further classify parking slots as occupied or vacant.
 
-- `main.py`: Runs the video loop and displays original vs processed frames.
-- `preprocess.py`: Implements the `Preprocessor` class with grayscale, CLAHE, and blur steps.
-- `videos/`: Place your input video files here (expects `video1.mp4`).
+---
 
-## Requirements
+## STEP 1: VIDEO PREPROCESSING
+
+This step performs basic preprocessing on video frames.
+
+### Approach
+
+- Convert frames to grayscale
+- Apply CLAHE (Contrast Limited Adaptive Histogram Equalization) for contrast enhancement
+- Apply Gaussian blur to reduce noise
+
+### Output
+
+- Original video frames
+- Processed frames (grayscale + contrast enhanced + blurred)
+
+### Files
+
+- `main.py`: Runs the video loop and displays frames
+- `preprocess.py`: Implements the preprocessing pipeline
+- `videos/`: Contains input video (`video1.mp4`)
+
+---
+
+## STEP 2: BACKGROUND SUBTRACTION
+
+This step detects moving objects (vehicles) using classical computer vision.
+
+### Approach
+
+- Uses MOG2 background subtraction
+- Applies thresholding to remove shadows
+- Applies morphological operations (opening and dilation) to remove noise
+
+### Output
+
+- Foreground mask:
+  - White pixels represent moving objects (vehicles)
+  - Black pixels represent background
+
+### Files
+
+- `background_subtraction.py`: Implements foreground detection
+- Updated `main.py`: Integrates preprocessing with background subtraction
+
+---
+
+## PROJECT PIPELINE
+
+Video Input  
+Preprocessing  
+Background Subtraction  
+Parking Slot Detection (next step)  
+Occupancy Classification  
+
+---
+
+## REQUIREMENTS
 
 - Python 3.x
 - OpenCV (`opencv-python`)
 
 Install dependencies:
 
-```bash
 pip install opencv-python
-```
 
-## Usage
+---
 
-1. Put your video file at `videos/video1.mp4`.
-2. Run the script:
+## USAGE
 
-```bash
+1. Place your video file in:
+
+videos/video1.mp4
+
+2. Run the program:
+
 python main.py
-```
 
-Controls:
+3. Controls:
 
-- Press `q` to quit the video window.
+- Press `q` to quit
 
-## Configuration
+---
 
-You can change preprocessing settings by editing `Preprocessor` in `preprocess.py`:
+## FUTURE WORK
 
-- `blur_kernel`: Gaussian blur kernel size (default `(5, 5)`).
-- `use_clahe`: Enable or disable CLAHE (default `True`).
+- Parking slot detection using ROI (Region of Interest)
+- Slot-wise occupancy classification
+- Nearest parking slot recommendation
+- Multi-camera support
 
-Example:
+---
 
-```python
-preprocessor = Preprocessor(blur_kernel=(7, 7), use_clahe=False)
-```
+## NOTES
 
-## Notes
-
-- If the video does not open, check the path and file name in `main.py`.
-- Press `q` while the window is focused to exit.
+- Ensure correct video path in `main.py`
+- Works best with static CCTV cameras
+- Uses only classical computer vision techniques
