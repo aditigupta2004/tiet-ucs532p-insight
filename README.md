@@ -1,140 +1,223 @@
-# 🚗 Parking spot Detection System using Computer Vision
+# Parking Slot Occupancy Detection Using Classical Computer Vision
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue.svg)
 ![OpenCV](https://img.shields.io/badge/OpenCV-4.x-green.svg)
 ![Status](https://img.shields.io/badge/Status-Active-success.svg)
-![Made With](https://img.shields.io/badge/Made%20With-Computer%20Vision-orange.svg)
 
-This project aims to detect empty and occupied parking spaces using CCTV video feeds using classical computer vision techniques (no deep learning).
+This project detects whether parking slots are free or occupied from a fixed CCTV-style video feed, using image processing only (no deep learning model).
 
-The system processes video frames, detects foreground objects (vehicles), and will further classify parking slots as occupied or vacant.
-
----
-
-## STEP 1: VIDEO PREPROCESSING
-
-This step performs basic preprocessing on video frames.
-
-### Approach
-
-- Convert frames to grayscale
-- Apply CLAHE (Contrast Limited Adaptive Histogram Equalization) for contrast enhancement
-- Apply Gaussian blur to reduce noise
-
-### Output
-
-- Original video frames
-- Processed frames (grayscale + contrast enhanced + blurred)
-![Step 1 Output](screenshots/Step1.png)
-
-### Files
-
-- `main.py`: Runs the video loop and displays frames
-- `preprocess.py`: Implements the preprocessing pipeline
-- `videos/`: Contains input video (`video1.mp4`)
+The system works by comparing each slot region in the current frame with a stored reference image that represents that slot when it is empty.
 
 ---
 
-## STEP 2: BACKGROUND SUBTRACTION
+## What You Get
 
-This step detects moving objects (vehicles) using classical computer vision.
-
-### Approach
-
-- Uses MOG2 background subtraction
-- Applies thresholding to remove shadows
-- Applies morphological operations (opening and dilation) to remove noise
-
-### Output
-
-- Foreground mask:
-  - White pixels represent moving objects (vehicles)
-  - Black pixels represent background
-![Step 2 Output](screenshots/Step2.png)
-
-### Files
-
-- `background_subtraction.py`: Implements foreground detection
-- Updated `main.py`: Integrates preprocessing with background subtraction
+- Manual slot annotation tool with occupancy labeling
+- Frame preprocessing for stable comparison
+- Slot-wise occupancy detection and on-screen HUD
+- Debug runtime to inspect slot references and pixel differences
 
 ---
 
-## STEP 3: PARKING SLOT DETECTION
+## End-to-End Pipeline
 
-This step detects parking slot occupancy using Region of Interest (ROI) based analysis.
-
-### Approach
-
-- Parking slots are manually defined using a click-based annotation tool
-- Each slot is represented as a polygon (4 points)
-- A mask is created for each slot region
-- Foreground pixels inside each slot are analyzed
-- If pixel density exceeds a threshold, the slot is marked as occupied
-
-### Output
-
-- Parking slots are drawn on the frame:
-  - Green: Empty
-  - Red: Occupied
-![Step 3 Output](screenshots/Step3_a.png)
-![Step 3 Output](screenshots/Step3_b.png)
-
-- ⚠️Current issue to be fixed:
-  - Shows green if a car already present
-  - Turns red only when a car is moving into the spot and turns green again when the car stops 
-
-### Files
-
-- `slot_annotation.py`: Tool to annotate parking slots
-- `slots.json`: Stores slot coordinates
-- Updated `main.py`: Performs occupancy detection
+1. Load video frame.
+2. Preprocess frame (grayscale, CLAHE, blur).
+3. For each annotated slot polygon:
+   - Create binary mask for that slot area.
+   - Compare current processed frame against that slot's stored empty reference.
+   - Count changed pixels inside the slot mask.
+   - Convert changed pixels to ratio of slot area.
+4. If ratio is above threshold, mark slot as occupied, else free.
+5. Draw slot outlines and show overall counts.
 
 ---
 
-## REQUIREMENTS
+## Project Files Explained
 
+### preprocess.py
+
+Contains class `Preprocessor`.
+
+Frame operations:
+- Convert BGR to grayscale
+- Apply CLAHE for local contrast improvement
+- Apply Gaussian blur to reduce high-frequency noise
+
+Output:
+- One processed single-channel image used by detection logic.
+
+### background_subtraction.py
+
+Contains class `BackgroundSubtractor`.
+
+Operations:
+- MOG2 foreground extraction
+- Shadow removal (thresholding)
+- Morphological cleanup (open + dilate)
+
+Current status:
+- Implemented and usable, but not currently consumed in the `main.py` and `main_ref.py` runtime decision path.
+
+### slot_annotation.py
+
+Interactive annotation tool for creating parking slots from the first frame of `videos/video1.mp4`.
+
+Workflow:
+1. Click 4 points for one slot polygon.
+2. Press `1` if currently occupied or `0` if currently empty.
+3. Repeat for all slots.
+4. Press `s` to save into `slots.json`.
+
+Controls:
+- Left click: add point (up to 4 for current slot)
+- `u`: undo last point
+- `d`: delete last saved slot
+- `r`: reset all slots
+- `s`: save slots
+- `q`: quit
+
+Saved format per slot:
+- `points`: list of 4 `[x, y]` coordinates
+- `occupied`: initial state (`0` free, `1` occupied)
+
+### slots.json
+
+Persistent storage of all annotated slots.
+
+Used by:
+- `main.py`
+- `main_ref.py`
+
+### main.py
+
+Primary runtime application.
+
+What it does:
+- Opens `videos/video1.mp4`
+- Loads slots from `slots.json`
+- Initializes slot reference frames
+- Runs occupancy detection every frame
+- Draws color-coded slot boundaries and HUD counts
+
+Color convention:
+- Green: free
+- Red: occupied
+
+Reference initialization logic:
+- If a slot is initially marked free in `slots.json`, first processed frame is used as empty reference.
+- If a slot is initially marked occupied, reference starts as `None` and fallback state is used until logic updates.
+
+### main_ref.py
+
+Debug version of `main.py` with extra windows for explainability.
+
+Additional windows:
+- `Reference Frames`: current stored empty reference image for each slot
+- `Diff View`: amplified absolute difference against reference for each slot
+
+Use this file when tuning thresholds or diagnosing wrong occupancy behavior.
+
+### videos/
+
+Input video folder.
+Expected default file: `videos/video1.mp4`.
+
+### screenshots/
+
+Reference outputs used in documentation.
+
+---
+
+## Occupancy Decision Rule
+
+Both `main.py` and `main_ref.py` use these constants:
+
+- `DIFF_THRESHOLD = 30`
+- `OCCUPANCY_RATIO = 0.25`
+
+Per slot:
+
+1. `diff = abs(current_processed - slot_reference)`
+2. Keep only slot pixels using mask.
+3. `changed_pixels = count(diff > DIFF_THRESHOLD)`
+4. `ratio = changed_pixels / slot_area`
+5. Occupied if `ratio > OCCUPANCY_RATIO`
+
+---
+
+## Installation
+
+Requirements:
 - Python 3.x
-- OpenCV (`opencv-python`)
+- OpenCV
+- NumPy
 
-Install dependencies:
+Install:
 
 ```bash
-pip install opencv-python
+pip install opencv-python numpy
 ```
 
 ---
 
-## USAGE
+## Run Guide
 
-1. Place your video file in:
+### 1) Prepare video
 
-```
+Place your footage at:
+
+```text
 videos/video1.mp4
 ```
-2. Run the slot annotation tool
+
+### 2) Annotate slots
 
 ```bash
 python slot_annotation.py
 ```
-- Steps:
-  - Plot the points in this specific order
-    - Top left
-    - Top right
-    - Bottom left
-    - Bottom right
-  - Save the slots by pressing `s`
-  - To reset the slots press `r`
-  - To quit press `q` 
 
-3. Run the program:
+After annotation, save with `s`.
+
+### 3) Run main detector
 
 ```bash
 python main.py
 ```
 
-4. Controls:
-- Press `s` to save the slots
-- Press `r` to reset the slots
-- Press `q` to quit
+### 4) Run debug detector (optional)
+
+```bash
+python main_ref.py
+```
+
+Quit windows with `q`.
 
 ---
+
+## Tuning Tips
+
+- If too many false occupied states:
+  - Increase `DIFF_THRESHOLD`
+  - Increase `OCCUPANCY_RATIO`
+- If parked cars are missed:
+  - Decrease `DIFF_THRESHOLD`
+  - Decrease `OCCUPANCY_RATIO`
+- Use `main_ref.py` to observe references and diff intensity before changing thresholds.
+
+---
+
+## Known Limitations
+
+- Camera shake or large lighting changes can affect pixel-difference logic.
+- Slots initially marked occupied do not begin with an empty reference image.
+- Annotation point order is user-dependent; inconsistent ordering can degrade ROI quality.
+
+---
+
+## Future Improvements
+
+- Add temporal smoothing (multi-frame confirmation before state switch)
+- Add per-slot adaptive thresholds
+- Integrate `background_subtraction.py` signal into final occupancy decision
+- Auto-sort annotation points clockwise before saving
