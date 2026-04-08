@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Parking Spot Detection System — Parking Slot Occupancy Detection</title>
+  <meta name="description" content="A classical computer vision system for real-time parking slot occupancy detection using frame differencing, CLAHE preprocessing, and polygon-based ROI analysis — no deep learning required." />
+  <meta name="keywords" content="computer vision, parking detection, OpenCV, image processing, CLAHE, background subtraction, STEM project" />
+  <meta property="og:title" content="Smart Parking Spot Detection System — Parking Slot Occupancy Detection" />
+  <meta property="og:description" content="Classical CV approach to parking occupancy detection using OpenCV and frame differencing." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body>
+
+<!-- ═══════════════════ SIDEBAR NAV ═══════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-icon">⬡</span>
+    <span class="logo-text">Smart Parking Spot Detection System</span>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="#home" class="nav-item active" data-section="home">
+      <span class="nav-icon">⌂</span> Overview
+    </a>
+    <a href="#problem" class="nav-item" data-section="problem">
+      <span class="nav-icon">◎</span> Problem Statement
+    </a>
+    <a href="#objectives" class="nav-item" data-section="objectives">
+      <span class="nav-icon">◈</span> SMART Objectives
+    </a>
+    <a href="#methodology" class="nav-item" data-section="methodology">
+      <span class="nav-icon">◧</span> Methodology
+    </a>
+    <a href="#timeline" class="nav-item" data-section="timeline">
+      <span class="nav-icon">◷</span> Timeline
+    </a>
+    <a href="#resources" class="nav-item" data-section="resources">
+      <span class="nav-icon">◫</span> Resources
+    </a>
+    <a href="#risks" class="nav-item" data-section="risks">
+      <span class="nav-icon">◬</span> Risk Management
+    </a>
+    <a href="#results" class="nav-item" data-section="results">
+      <span class="nav-icon">◉</span> Results
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+      <span class="toggle-icon">◑</span>
+      <span class="toggle-label">Toggle Mode</span>
+    </button>
+    <a href="https://github.com/" class="gh-link" target="_blank">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      GitHub Repo
+    </a>
+  </div>
+</aside>
+
+<!-- hamburger -->
+<button class="hamburger" id="hamburger" aria-label="Open menu">
+  <span></span><span></span><span></span>
+</button>
+<div class="overlay" id="overlay"></div>
+
+<!-- ═══════════════════ MAIN CONTENT ═══════════════════ -->
+<main class="main-content">
+
+  <!-- ── SECTION 1: HOME ───────────────────────────────── -->
+  <section id="home" class="section hero-section">
+    <div class="hero-bg-grid"></div>
+    <h1 class="hero-title">
+      Smart Parking Spot Detection System
+    </h1>
+    <p class="hero-subtitle">Parking Slot Occupancy Detection<br/>Using Classical Computer Vision</p>
+
+    <div class="project-identity-panel">
+      <div class="project-identity-header">
+        <span class="obj-tag">Project Identity</span>
+      </div>
+      <div class="project-identity-grid">
+        <div class="identity-item identity-project">
+          <span class="identity-label">Project</span>
+          <strong>Smart Parking Spot Detection System</strong>
+        </div>
+        <div class="identity-item">
+          <span class="identity-label">Subject</span>
+          <strong>Computer Vision (UCS532P)</strong>
+        </div>
+        <div class="identity-item">
+          <span class="identity-label">Faculty</span>
+          <strong>Dr. Raghav B. Venkataramaiyer</strong>
+        </div>
+        <div class="identity-item">
+          <span class="identity-label">Team</span>
+          <strong>Team Insight</strong>
+        </div>
+        <div class="identity-item identity-members">
+          <span class="identity-label">Members</span>
+          <strong>Aditi Dilip Kumar Gupta, Arin Goyal</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="elevator-pitch">
+      <div class="pitch-card gap">
+        <span class="pitch-label">The Gap</span>
+        <p>Urban parking facilities lack real-time, cost-effective occupancy monitoring — traditional sensor-based systems require expensive hardware per-slot installation and constant maintenance, leaving most lots without intelligent space management.</p>
+      </div>
+      <div class="pitch-card solution">
+        <span class="pitch-label">The Solution</span>
+        <p>Smart Parking Spot Detection System uses a single fixed CCTV camera and classical image processing — frame differencing, CLAHE contrast enhancement, and polygon-masked ROI analysis — to detect slot occupancy in real time without any deep learning or specialized hardware.</p>
+      </div>
+      <div class="pitch-card impact">
+        <span class="pitch-label">The Impact</span>
+        <p>By eliminating per-sensor costs and ML model dependencies, this system can be deployed in any camera-equipped parking facility, reducing urban traffic congestion from lot-searching by up to 30% and cutting infrastructure costs by over 90%.</p>
+      </div>
+    </div>
+
+    <div class="quick-nav">
+      <a href="#problem" class="quick-card">
+        <span class="qc-icon">◎</span>
+        <span class="qc-title">Problem</span>
+        <span class="qc-desc">Context & research gap</span>
+      </a>
+      <a href="#objectives" class="quick-card">
+        <span class="qc-icon">◈</span>
+        <span class="qc-title">Objectives</span>
+        <span class="qc-desc">SMART goals</span>
+      </a>
+      <a href="#methodology" class="quick-card">
+        <span class="qc-icon">◧</span>
+        <span class="qc-title">Methodology</span>
+        <span class="qc-desc">Architecture & pipeline</span>
+      </a>
+      <a href="#timeline" class="quick-card">
+        <span class="qc-icon">◷</span>
+        <span class="qc-title">Timeline</span>
+        <span class="qc-desc">Project roadmap</span>
+      </a>
+      <a href="#results" class="quick-card">
+        <span class="qc-icon">◉</span>
+        <span class="qc-title">Results</span>
+        <span class="qc-desc">Deliverables & outputs</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ── SECTION 2: PROBLEM ────────────────────────────── -->
+  <section id="problem" class="section">
+    <div class="section-label">01 — Problem Statement</div>
+    <h2 class="section-title">The Urban Parking Crisis</h2>
+
+    <div class="prose-block">
+      <h3>Background Context</h3>
+      <p>Urban traffic congestion is a globally recognized challenge. Studies from the INRIX Global Traffic Scorecard report that drivers in major cities spend an average of <strong>17 minutes per trip</strong> searching for parking — accounting for approximately 30% of total urban traffic. As vehicle ownership continues to grow, this problem compounds at scale.</p>
+      <p>Modern parking facilities typically rely on one of two approaches: (1) physical loop-detector sensors embedded in each bay costing $300–$800 per space, or (2) manual attendant monitoring with zero real-time data. Neither approach is scalable, cost-effective, or easily retrofittable to existing infrastructure.</p>
+    </div>
+
+    <div class="callout-box warning">
+      <span class="callout-icon">◬</span>
+      <div>
+        <strong>Problem Gap</strong><br/>
+        No lightweight, camera-only, infrastructure-free solution exists that achieves reliable occupancy detection without deep learning model dependencies, GPU requirements, or labelled training datasets.
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="info-card">
+        <div class="info-icon">◎</div>
+        <h4>Academic Relevance</h4>
+        <p>This project applies fundamental computer vision principles — spatial filtering, morphological operations, ROI masking, and statistical thresholding — studied in image processing coursework. It bridges theory and practical deployment in a real urban context.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">◈</div>
+        <h4>Research Motivation</h4>
+        <p>The absence of a dataset-free, zero-GPU baseline system represents an unexplored niche. Establishing reliable accuracy benchmarks for classical CV approaches informs future hybrid systems and validates lightweight deployment in resource-constrained environments.</p>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-item">
+        <span class="stat-num">30%</span>
+        <span class="stat-desc">of urban traffic from parking search</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">$800</span>
+        <span class="stat-desc">avg per-bay sensor cost</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">0</span>
+        <span class="stat-desc">training data required by our system</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">1</span>
+        <span class="stat-desc">camera for the entire lot</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 3: OBJECTIVES ─────────────────────────── -->
+  <section id="objectives" class="section">
+    <div class="section-label">02 — SMART Objectives</div>
+    <h2 class="section-title">Project Objectives</h2>
+
+    <div class="main-objective">
+      <span class="obj-tag">Primary Objective</span>
+      <p>To design, implement, and evaluate a real-time parking slot occupancy detection system using classical computer vision techniques that achieves ≥90% classification accuracy on a standard parking lot video dataset without deep learning models or per-slot sensors.</p>
+    </div>
+
+    <div class="smart-grid">
+      <div class="smart-card">
+        <div class="smart-header">
+          <span class="smart-num">01</span>
+          <div class="smart-badges">
+            <span class="badge s">Specific</span>
+            <span class="badge m">Measurable</span>
+          </div>
+        </div>
+        <h4>Slot Annotation System</h4>
+        <p>Develop an interactive polygon annotation tool that allows a user to label all parking slots in a camera view within 10 minutes, saving persistent slot geometry to JSON.</p>
+        <div class="smart-meta">
+          <span>⏱ Week 2</span>
+          <span>✓ Attainable</span>
+          <span>↗ Relevant</span>
+        </div>
+      </div>
+
+      <div class="smart-card">
+        <div class="smart-header">
+          <span class="smart-num">02</span>
+          <div class="smart-badges">
+            <span class="badge m">Measurable</span>
+            <span class="badge a">Attainable</span>
+          </div>
+        </div>
+        <h4>Preprocessing Pipeline</h4>
+        <p>Implement a frame preprocessing pipeline (grayscale → CLAHE → Gaussian blur) that reduces false-positive rate by ≥15% compared to raw frame comparison on test footage.</p>
+        <div class="smart-meta">
+          <span>⏱ Week 3–4</span>
+          <span>✓ Attainable</span>
+          <span>↗ Relevant</span>
+        </div>
+      </div>
+
+      <div class="smart-card">
+        <div class="smart-header">
+          <span class="smart-num">03</span>
+          <div class="smart-badges">
+            <span class="badge s">Specific</span>
+            <span class="badge t">Time-bound</span>
+          </div>
+        </div>
+        <h4>Occupancy Detection Core</h4>
+        <p>Implement frame-differencing occupancy logic achieving ≥90% slot-level accuracy (F1-score) on a 30-minute evaluation video by Week 7, validated against manual ground-truth annotations.</p>
+        <div class="smart-meta">
+          <span>⏱ Week 5–7</span>
+          <span>✓ Attainable</span>
+          <span>↗ Relevant</span>
+        </div>
+      </div>
+
+      <div class="smart-card">
+        <div class="smart-header">
+          <span class="smart-num">04</span>
+          <div class="smart-badges">
+            <span class="badge r">Relevant</span>
+            <span class="badge m">Measurable</span>
+          </div>
+        </div>
+        <h4>Debug Visualization Tool</h4>
+        <p>Build a multi-window debug runtime displaying reference frames and amplified pixel-diff maps per slot, enabling threshold tuning within 2 iterations of initial calibration.</p>
+        <div class="smart-meta">
+          <span>⏱ Week 6–8</span>
+          <span>✓ Attainable</span>
+          <span>↗ Relevant</span>
+        </div>
+      </div>
+
+      <div class="smart-card">
+        <div class="smart-header">
+          <span class="smart-num">05</span>
+          <div class="smart-badges">
+            <span class="badge t">Time-bound</span>
+            <span class="badge s">Specific</span>
+          </div>
+        </div>
+        <h4>Evaluation & Documentation</h4>
+        <p>Produce a final technical report with accuracy benchmarks, performance tables, known limitations, and reproducible setup guide by Week 12 for academic submission.</p>
+        <div class="smart-meta">
+          <span>⏱ Week 10–12</span>
+          <span>✓ Attainable</span>
+          <span>↗ Relevant</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 4: METHODOLOGY ────────────────────────── -->
+  <section id="methodology" class="section">
+    <div class="section-label">03 — Methodology</div>
+    <h2 class="section-title">System Design & Implementation</h2>
+
+    <!-- Architecture -->
+    <div class="subsection">
+      <h3>System Architecture</h3>
+      <p>The system is composed of four independent Python modules that form a linear processing pipeline. Each module has a single responsibility and communicates via standardized data contracts (NumPy arrays, JSON files).</p>
+
+      <div class="arch-diagram">
+        <div class="arch-node source">
+          <div class="arch-icon">▶</div>
+          <div class="arch-label">Video Input<br/><code>video1.mp4</code></div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node process">
+          <div class="arch-icon">⬡</div>
+          <div class="arch-label">Preprocessor<br/><code>preprocess.py</code></div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node process">
+          <div class="arch-icon">◧</div>
+          <div class="arch-label">Slot Masking<br/><code>slots.json</code></div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node decision">
+          <div class="arch-icon">◈</div>
+          <div class="arch-label">Diff Engine<br/><code>main.py</code></div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node output">
+          <div class="arch-icon">◉</div>
+          <div class="arch-label">HUD Display<br/><code>cv2.imshow</code></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="subsection">
+      <h3>Tech Stack</h3>
+      <div class="tech-grid">
+        <div class="tech-item">
+          <span class="tech-name">Python 3.x</span>
+          <span class="tech-role">Runtime</span>
+        </div>
+        <div class="tech-item">
+          <span class="tech-name">OpenCV 4.x</span>
+          <span class="tech-role">Vision Core</span>
+        </div>
+        <div class="tech-item">
+          <span class="tech-name">NumPy</span>
+          <span class="tech-role">Array Ops</span>
+        </div>
+        <div class="tech-item">
+          <span class="tech-name">MOG2</span>
+          <span class="tech-role">BG Subtraction</span>
+        </div>
+        <div class="tech-item">
+          <span class="tech-name">CLAHE</span>
+          <span class="tech-role">Contrast Enhance</span>
+        </div>
+        <div class="tech-item">
+          <span class="tech-name">JSON</span>
+          <span class="tech-role">Slot Storage</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module Development -->
+    <div class="subsection">
+      <h3>Module Development</h3>
+      <div class="module-list">
+
+        <div class="module-card">
+          <div class="module-header">
+            <code class="module-file">preprocess.py</code>
+            <span class="module-tag">Core</span>
+          </div>
+          <p>Converts each BGR frame into a normalized single-channel representation suitable for stable comparison.</p>
+          <div class="pipeline-steps">
+            <span class="pipe-step">BGR</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipe-step">Grayscale</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipe-step">CLAHE</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipe-step">Gaussian Blur (5×5)</span>
+          </div>
+          <div class="code-block">
+<pre><code>clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+gray = clahe.apply(gray)
+blurred = cv2.GaussianBlur(gray, (5, 5), 0)</code></pre>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-header">
+            <code class="module-file">background_subtraction.py</code>
+            <span class="module-tag">Auxiliary</span>
+          </div>
+          <p>MOG2-based foreground extraction with shadow removal (threshold &gt;200) and morphological cleanup. Currently implemented but not in the primary decision path — reserved for future hybrid scoring.</p>
+          <div class="pipeline-steps">
+            <span class="pipe-step">MOG2</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipe-step">Threshold</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipe-step">MORPH_OPEN</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipe-step">MORPH_DILATE</span>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-header">
+            <code class="module-file">slot_annotation.py</code>
+            <span class="module-tag">Tool</span>
+          </div>
+          <p>Interactive 4-point polygon annotation GUI. Click-to-place corners, press <kbd>1</kbd>/<kbd>0</kbd> for occupancy state, <kbd>S</kbd> to persist to <code>slots.json</code>. Supports undo, delete, and full reset.</p>
+        </div>
+
+        <div class="module-card">
+          <div class="module-header">
+            <code class="module-file">main.py / main_ref.py</code>
+            <span class="module-tag">Runtime</span>
+          </div>
+          <p>Primary occupancy detection loop. For each frame: loads slot polygons, applies preprocessor, diffs each slot against its stored empty reference, counts changed pixels above threshold, classifies as occupied/free.</p>
+          <div class="code-block">
+<pre><code># Occupancy decision rule
+diff = cv2.absdiff(processed, slot_references[i])
+diff_masked = cv2.bitwise_and(diff, diff, mask=mask)
+changed_pixels = np.sum(diff_masked > DIFF_THRESHOLD)  # 30
+ratio = changed_pixels / (slot_area + 1)
+is_occupied = ratio > OCCUPANCY_RATIO  # 0.25</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Workflow -->
+    <div class="subsection">
+      <h3>Execution Workflow</h3>
+      <div class="workflow-steps">
+        <div class="wf-step">
+          <div class="wf-num">1</div>
+          <div class="wf-content">
+            <strong>Initialization</strong>
+            <p>Load video, read first frame, preprocess it. For all slots marked <code>occupied=0</code> in JSON, store first processed frame as empty reference. Slots marked <code>occupied=1</code> start with <code>None</code> reference.</p>
+          </div>
+        </div>
+        <div class="wf-step">
+          <div class="wf-num">2</div>
+          <div class="wf-content">
+            <strong>Per-Frame Processing</strong>
+            <p>Read frame → preprocess → for each slot: create polygon mask, compute absdiff vs reference, mask diff to slot region, compute changed pixel ratio.</p>
+          </div>
+        </div>
+        <div class="wf-step">
+          <div class="wf-num">3</div>
+          <div class="wf-content">
+            <strong>State Transition & Reference Update</strong>
+            <p>If slot transitions from occupied→free, capture current processed frame as the new empty reference for that slot. This enables dynamic adaptation when vehicles depart.</p>
+          </div>
+        </div>
+        <div class="wf-step">
+          <div class="wf-num">4</div>
+          <div class="wf-content">
+            <strong>Visualization</strong>
+            <p>Draw color-coded slot polygons (green=free, red=occupied), numbered labels, and HUD overlay showing total/occupied/free counts.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Testing & Validation -->
+    <div class="subsection">
+      <h3>Testing & Validation</h3>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Definition</th>
+              <th>Target</th>
+              <th>Method</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Accuracy</td>
+              <td>Correct slot classifications / total slots per frame</td>
+              <td>≥ 90%</td>
+              <td>Manual ground-truth labels</td>
+            </tr>
+            <tr>
+              <td>Precision</td>
+              <td>True occupied / all predicted occupied</td>
+              <td>≥ 88%</td>
+              <td>Frame-by-frame audit</td>
+            </tr>
+            <tr>
+              <td>Recall</td>
+              <td>True occupied / all actual occupied</td>
+              <td>≥ 85%</td>
+              <td>Frame-by-frame audit</td>
+            </tr>
+            <tr>
+              <td>F1-Score</td>
+              <td>Harmonic mean of precision & recall</td>
+              <td>≥ 0.87</td>
+              <td>Computed metric</td>
+            </tr>
+            <tr>
+              <td>Latency</td>
+              <td>Processing time per frame</td>
+              <td>&lt; 33ms (30fps)</td>
+              <td>Python time module</td>
+            </tr>
+            <tr>
+              <td>Reference Stability</td>
+              <td>False transitions on parked vehicle</td>
+              <td>0 per 5 min</td>
+              <td>Continuous monitoring</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Constraints -->
+    <div class="subsection">
+      <h3>Constraints & Safety</h3>
+      <div class="constraint-grid">
+        <div class="constraint-card safe">
+          <span class="c-icon">✓</span>
+          <strong>Camera Static</strong>
+          <p>System assumes a fixed overhead/angled CCTV perspective. No camera movement compensation implemented.</p>
+        </div>
+        <div class="constraint-card safe">
+          <span class="c-icon">✓</span>
+          <strong>No PII</strong>
+          <p>Video is processed locally, no face/plate data extracted or stored. Privacy-safe by design.</p>
+        </div>
+        <div class="constraint-card warn">
+          <span class="c-icon">⚠</span>
+          <strong>Lighting Sensitivity</strong>
+          <p>Sudden lighting changes (shadows, headlights) can trigger false occupancy transitions. CLAHE partially mitigates this.</p>
+        </div>
+        <div class="constraint-card warn">
+          <span class="c-icon">⚠</span>
+          <strong>Initial Occupied Slots</strong>
+          <p>Slots marked occupied at start have no empty reference until a vehicle departs. Fallback to JSON annotation state used during this period.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 5: TIMELINE ───────────────────────────── -->
+  <section id="timeline" class="section">
+    <div class="section-label">04 — Roadmap</div>
+    <h2 class="section-title">Project Roadmap</h2>
+
+    <div class="roadmap-grid">
+      <div class="roadmap-card research">
+        <div class="roadmap-header">
+          <span class="roadmap-step">Phase 01</span>
+          <h4>Research & Setup</h4>
+        </div>
+        <ul class="roadmap-list">
+          <li>Literature review and problem framing</li>
+          <li>Environment setup and toolchain preparation</li>
+          <li>Dataset acquisition and slot planning</li>
+        </ul>
+      </div>
+
+      <div class="roadmap-card dev">
+        <div class="roadmap-header">
+          <span class="roadmap-step">Phase 02</span>
+          <h4>Core Development</h4>
+        </div>
+        <ul class="roadmap-list">
+          <li>Annotation workflow and slot geometry capture</li>
+          <li>Preprocessing pipeline and contrast enhancement</li>
+          <li>Occupancy detection core and slot scoring</li>
+        </ul>
+      </div>
+
+      <div class="roadmap-card test">
+        <div class="roadmap-header">
+          <span class="roadmap-step">Phase 03</span>
+          <h4>Validation</h4>
+        </div>
+        <ul class="roadmap-list">
+          <li>Threshold tuning and debug visualization</li>
+          <li>Accuracy checks against manual labels</li>
+          <li>Stability testing across lighting conditions</li>
+        </ul>
+      </div>
+
+      <div class="roadmap-card refine">
+        <div class="roadmap-header">
+          <span class="roadmap-step">Phase 04</span>
+          <h4>Delivery</h4>
+        </div>
+        <ul class="roadmap-list">
+          <li>Code cleanup and final integration</li>
+          <li>Report writing and documentation polish</li>
+          <li>Submission-ready project packaging</li>
+        </ul>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── SECTION 6: RESOURCES ──────────────────────────── -->
+  <section id="resources" class="section">
+    <div class="section-label">05 — Resources & Budget</div>
+    <h2 class="section-title">Tools, Dependencies & Team</h2>
+
+    <div class="resource-grid">
+      <div class="resource-card">
+        <h4>Software</h4>
+        <ul class="resource-list">
+          <li><span class="res-name">Python 3.10+</span><span class="res-free">Free</span></li>
+          <li><span class="res-name">OpenCV 4.x</span><span class="res-free">Open Source</span></li>
+          <li><span class="res-name">NumPy</span><span class="res-free">Open Source</span></li>
+          <li><span class="res-name">VS Code</span><span class="res-free">Free</span></li>
+          <li><span class="res-name">Git / GitHub</span><span class="res-free">Free</span></li>
+        </ul>
+      </div>
+      <div class="resource-card">
+        <h4>Hardware</h4>
+        <ul class="resource-list">
+          <li><span class="res-name">Dev Laptop (i5/i7)</span><span class="res-cost">Existing</span></li>
+          <li><span class="res-name">Webcam / CCTV</span><span class="res-cost">Existing</span></li>
+          <li><span class="res-name">8GB RAM minimum</span><span class="res-cost">Existing</span></li>
+          <li><span class="res-name">GPU</span><span class="res-free">Not Required</span></li>
+        </ul>
+      </div>
+      <div class="resource-card">
+        <h4>Team Roles</h4>
+        <ul class="resource-list">
+          <li><span class="res-name">Aditi Dilip Kumar Gupta</span><span class="res-role">Team Insight</span></li>
+          <li><span class="res-name">Arin Goyal</span><span class="res-role">Team Insight</span></li>
+          <li><span class="res-name">Dr. Raghav B. Venkataramaiyer</span><span class="res-role">Faculty</span></li>
+          <li><span class="res-name">Computer Vision (UCS532P)</span><span class="res-role">Subject</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table budget-table">
+        <thead>
+          <tr><th>Item</th><th>Category</th><th>Estimated Cost</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Python + OpenCV</td><td>Software</td><td>$0</td><td class="status-ok">✓ Free</td></tr>
+          <tr><td>Development Machine</td><td>Hardware</td><td>$0</td><td class="status-ok">✓ Available</td></tr>
+          <tr><td>Test Video Footage</td><td>Dataset</td><td>$0</td><td class="status-ok">✓ Self-recorded</td></tr>
+          <tr><td>GitHub Pages Hosting</td><td>Deployment</td><td>$0</td><td class="status-ok">✓ Free</td></tr>
+          <tr><td>Cloud GPU</td><td>Compute</td><td>$0</td><td class="status-ok">✓ Not needed</td></tr>
+          <tr class="total-row"><td colspan="2"><strong>Total Project Cost</strong></td><td><strong>$0</strong></td><td class="status-ok">✓ Funded</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout-box success">
+      <span class="callout-icon">✓</span>
+      <div><strong>No External Funding Required</strong><br/>
+      This project is fully self-sufficient using open-source tools and existing hardware. All dependencies are freely available under permissive licenses (Apache 2.0, BSD, MIT).</div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 7: RISK MANAGEMENT ───────────────────── -->
+  <section id="risks" class="section">
+    <div class="section-label">06 — Risk Management</div>
+    <h2 class="section-title">Technical Risks & Mitigation</h2>
+
+    <div class="risk-grid">
+      <div class="risk-card high">
+        <div class="risk-header">
+          <span class="risk-level">High</span>
+          <h4>Lighting Variation</h4>
+        </div>
+        <p class="risk-desc">Sudden daylight changes or artificial light flickers cause frame-wide intensity shifts, producing mass false-positive occupancy detections.</p>
+        <div class="risk-mitigation">
+          <strong>Mitigation:</strong> CLAHE normalization reduces global illumination effects. Temporal smoothing (multi-frame confirmation) to be added in refinement phase.
+        </div>
+        <div class="risk-fallback">
+          <strong>Fallback:</strong> Increase DIFF_THRESHOLD dynamically based on frame mean intensity; add per-slot adaptive thresholding.
+        </div>
+      </div>
+
+      <div class="risk-card medium">
+        <div class="risk-header">
+          <span class="risk-level">Medium</span>
+          <h4>No Initial Reference for Occupied Slots</h4>
+        </div>
+        <p class="risk-desc">Slots annotated as occupied at video start have no empty reference image, causing fallback to annotation state for potentially long periods.</p>
+        <div class="risk-mitigation">
+          <strong>Mitigation:</strong> Auto-update reference when slot first transitions to free state. Log reference update events to console.
+        </div>
+        <div class="risk-fallback">
+          <strong>Fallback:</strong> Pre-capture an empty-lot reference frame before vehicle arrival and inject into slot_references at startup.
+        </div>
+      </div>
+
+      <div class="risk-card medium">
+        <div class="risk-header">
+          <span class="risk-level">Medium</span>
+          <h4>Camera Shake / Drift</h4>
+        </div>
+        <p class="risk-desc">Minor camera movement (wind, vibration) shifts the entire frame, causing reference mismatch across all slots simultaneously.</p>
+        <div class="risk-mitigation">
+          <strong>Mitigation:</strong> Mount camera securely. Use larger polygon ROIs to tolerate minor alignment drift.
+        </div>
+        <div class="risk-fallback">
+          <strong>Fallback:</strong> Add global frame alignment (ECC/ORB homography) as preprocessing step before diff computation.
+        </div>
+      </div>
+
+      <div class="risk-card low">
+        <div class="risk-header">
+          <span class="risk-level">Low</span>
+          <h4>Point Annotation Order</h4>
+        </div>
+        <p class="risk-desc">Non-clockwise polygon annotation creates self-intersecting quads, causing incorrect ROI masking and degraded detection quality.</p>
+        <div class="risk-mitigation">
+          <strong>Mitigation:</strong> Add convex hull auto-sorting of annotation points before saving to slots.json.
+        </div>
+        <div class="risk-fallback">
+          <strong>Fallback:</strong> Visual preview of polygon in annotation tool allows user to verify shape before confirming.
+        </div>
+      </div>
+
+      <div class="risk-card low">
+        <div class="risk-header">
+          <span class="risk-level">Low</span>
+          <h4>Slow Frame Rate on Low-end Hardware</h4>
+        </div>
+        <p class="risk-desc">High-resolution video or many slots may cause processing latency exceeding real-time on underpowered machines.</p>
+        <div class="risk-mitigation">
+          <strong>Mitigation:</strong> Resize input frames to 720p before processing. Profile with cProfile and optimize tight loops.
+        </div>
+        <div class="risk-fallback">
+          <strong>Fallback:</strong> Process every Nth frame (e.g. every 3rd frame) to maintain real-time display at reduced detection frequency.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 8: RESULTS ────────────────────────────── -->
+  <section id="results" class="section">
+    <div class="section-label">07 — Results & Deliverables</div>
+    <h2 class="section-title">Expected Outputs</h2>
+
+    <div class="deliverables-grid">
+      <div class="deliverable-card">
+        <span class="del-icon">◧</span>
+        <h4>Source Code Repository</h4>
+        <p>Fully documented Python codebase with all modules, annotation tool, and slots data — hosted on GitHub with MIT license.</p>
+        <span class="del-status done">✓ In Progress</span>
+      </div>
+      <div class="deliverable-card">
+        <span class="del-icon">◉</span>
+        <h4>Working Prototype</h4>
+        <p>Real-time demo video showing occupancy detection on parking lot footage with HUD overlay and debug visualization mode.</p>
+        <span class="del-status done">✓ In Progress</span>
+      </div>
+      <div class="deliverable-card">
+        <span class="del-icon">◈</span>
+        <h4>Accuracy Report</h4>
+        <p>Tabulated precision/recall/F1 metrics across multiple test videos with varied lighting and occupancy states.</p>
+        <span class="del-status pending">⏳ Week 10</span>
+      </div>
+      <div class="deliverable-card">
+        <span class="del-icon">◷</span>
+        <h4>Technical Paper</h4>
+        <p>IEEE-format academic paper covering methodology, experiments, results, limitations, and future work.</p>
+        <span class="del-status pending">⏳ Week 12</span>
+      </div>
+      <div class="deliverable-card">
+        <span class="del-icon">◎</span>
+        <h4>Project Presentation</h4>
+        <p>Final slides and live demo for academic panel review, including system walkthrough and benchmark highlights.</p>
+        <span class="del-status pending">⏳ Week 12</span>
+      </div>
+      <div class="deliverable-card">
+        <span class="del-icon">⬡</span>
+        <h4>Documentation Website</h4>
+        <p>This GitHub Pages site — fully documenting design decisions, architecture, and results for public reference.</p>
+        <span class="del-status done">✓ Complete</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── FOOTER ────────────────────────────────────────── -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="logo-icon">⬡</span> Smart Parking Spot Detection System
+      </div>
+      <div class="footer-meta">
+        <p>Computer Vision (UCS532P) · Team Insight</p>
+        <p>Faculty: <strong>Dr. Raghav B. Venkataramaiyer</strong></p>
+        <p>Members: <strong>Aditi Dilip Kumar Gupta</strong> · <strong>Arin Goyal</strong></p>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/" target="_blank">GitHub</a>
+        <a href="#home">Back to Top</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      Smart Parking Spot Detection System · Team Insight · Faculty: Dr. Raghav B. Venkataramaiyer · Subject: Computer Vision (UCS532P) · Deployable on GitHub Pages
+    </div>
+  </footer>
+
+</main>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
