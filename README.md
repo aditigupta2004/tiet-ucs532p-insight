@@ -116,6 +116,15 @@ videos/video1.mp4
 ```bash
 python slot_annotation.py
 ```
+- Steps:
+  - Plot the points in this specific order
+    - Top left
+    - Top right
+    - Bottom left
+    - Bottom right
+  - Save the slots by pressing `s`
+  - To reset the slots press `r`
+  - To quit press `q` 
 
 3. Run the program:
 
