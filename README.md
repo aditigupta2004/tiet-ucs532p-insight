@@ -195,29 +195,8 @@ Quit windows with `q`.
 
 ---
 
-## Tuning Tips
-
-- If too many false occupied states:
-  - Increase `DIFF_THRESHOLD`
-  - Increase `OCCUPANCY_RATIO`
-- If parked cars are missed:
-  - Decrease `DIFF_THRESHOLD`
-  - Decrease `OCCUPANCY_RATIO`
-- Use `main_ref.py` to observe references and diff intensity before changing thresholds.
-
----
-
 ## Known Limitations
 
 - Camera shake or large lighting changes can affect pixel-difference logic.
 - Slots initially marked occupied do not begin with an empty reference image.
 - Annotation point order is user-dependent; inconsistent ordering can degrade ROI quality.
-
----
-
-## Future Improvements
-
-- Add temporal smoothing (multi-frame confirmation before state switch)
-- Add per-slot adaptive thresholds
-- Integrate `background_subtraction.py` signal into final occupancy decision
-- Auto-sort annotation points clockwise before saving
