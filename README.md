@@ -4,6 +4,8 @@
 ![OpenCV](https://img.shields.io/badge/OpenCV-4.x-green.svg)
 ![Status](https://img.shields.io/badge/Status-Active-success.svg)
 
+Live Demo: https://aditigupta2004.github.io/tiet-ucs532p-insight/
+
 This project detects whether parking slots are free or occupied from a fixed CCTV-style video feed, using image processing only (no deep learning model).
 
 The system works by comparing each slot region in the current frame with a stored reference image that represents that slot when it is empty.
